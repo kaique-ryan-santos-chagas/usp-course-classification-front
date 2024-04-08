@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+
+<html>
+
+    <head>
+        
+        <title>USP - Encontre um curso pra mim</title>
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        
+        <style>
+            
+            #subjects_list {
+                list-style-type: none;
+            }
+
+            h2, h3 {
+                font-family: Arial, Helvetica, sans-serif;
+            }
+
+            li {
+
+                justify-content: center;
+                align-items: center;
+                display: flex;
+            }
+
+            .input_box {
+
+                margin-right: 10px;
+
+            }
+
+            #send {
+
+                background-color: blue;
+                color: white;
+                width: 150px;
+                height: 50px;
+                font-weight: bold;
+                font-family: Arial, Helvetica, sans-serif;
+                margin-top: 20px;
+                margin-bottom: 20px;
+                border: none;
+                cursor: pointer;
+                border-radius: 20px;
+
+            }
+
+            #loading {
+
+                width: 100px;
+                display: none;
+
+            }
+
+        </style>
+
+    </head>
+
+    <body>
+
+        <center>
+
+            <img src="img/usp.jpg.png"/>
+            <h2>Disciplinas dos cursos</h2>
+
+            <ul id="subjects_list"></ul>
+            <button id="send">Encontrar curso</button>
+            <img src="https://i.pinimg.com/originals/1c/13/f3/1c13f3fe7a6bba370007aea254e195e3.gif" id="loading" />
+
+        </center>
+
+    <script>
+        
+        axios({
+
+            method: "get",
+            url: "http://127.0.0.1:5000/subjects",
+
+        }).then(function (response) {
+            
+            var subjects_list = document.getElementById('subjects_list');
+
+            for(subject of response.data){
+                
+                var item_list = document.createElement('li');
+                
+                var check_list = document.createElement('input');
+                check_list.setAttribute('type', 'checkbox');
+                check_list.setAttribute('class', 'input_box');
+
+                var text = document.createElement('h3');
+                text.textContent = subject;
+
+                item_list.append(check_list);
+                item_list.append(text);
+
+                subjects_list.append(item_list);
+
+            }
+
+        });
+
+        var button_send = document.getElementById('send');
+
+        button_send.onclick = () => {
+            
+            var button = document.getElementById('send');
+            button.style.display = 'none';
+
+            var loading = document.getElementById('loading');
+            loading.style.display = 'flex';
+
+            var inputs_data = [];
+            var inputs = document.getElementsByClassName('input_box');
+            
+            for(input of inputs){
+                if(input.checked)
+                    inputs_data.push(1);
+                else 
+                    inputs_data.push(0);
+            }
+
+            axios({
+
+                method: 'post',
+                url: 'http://127.0.0.1:5000/send/subjects',
+                data: {
+                    inputs_data
+                },
+
+             }).then(function(response){
+
+                if(response.data == 'Engenharia da Computação')
+                    window.location.href = 'https://www5.usp.br/ensino/graduacao/cursos-oferecidos/engenharia-de-computacao/';
+                if(response.data == 'Sistemas de Informação')
+                    window.location.href = 'https://www5.usp.br/ensino/graduacao/cursos-oferecidos/sistemas-de-informacao/';
+                if(response.data == 'Ciência da Computação')
+                    window.location.href = 'https://www5.usp.br/ensino/graduacao/cursos-oferecidos/ciencias-da-computacao/';
+
+             });
+
+        }
+
+    </script>
+
+    </body>
+
+</html>
